@@ -1,5 +1,5 @@
 
-# MOTBSG Battleship game
+# File transfer program
 
 ## Build
 
