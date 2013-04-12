@@ -5,26 +5,47 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "config.h"
 #include "net.h"
 #include "protocol.h"
 
 void handler(int client) {
-  int n;
+  int outputFile;
   char buff[BUFFER_SIZE];
 
-  bzero(buff, BUFFER_SIZE);
-  n = read(client, buff, BUFFER_SIZE);
-  if (n < 0) server_error("reading to socket");
+  outputFile = open("output.txt", O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);
+  if (outputFile == -1)
+  {
+    server_error("cannot open output file");
+  }
 
-  printf("Server received %s\n", buff);
+  while (1)
+  {
+    int bytes_read = read(client, buff, sizeof(buff));
+    if (bytes_read < 0)
+    { // handle errors
+      server_error("read from socket");
+    }
 
-  n = write(client, buff, BUFFER_SIZE);
-  if (n < 0) server_error("writing to socket");
+    if (bytes_read == 0)
+    { // we're done receiving the file
+      break;
+    }
+
+    int bytes_written = write(outputFile, buff, bytes_read);
+    if (bytes_written <= 0)
+    { // handle errors
+      server_error("write to output file");
+    }
+  }
+
+  close(outputFile);
+  printf("Finished receiving");
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     Server *server = create_server();
 
     server->port = PORT;

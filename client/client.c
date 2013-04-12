@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 
 #include "config.h"
 #include "net.h"
@@ -12,31 +13,64 @@ void handler(char *msg) {
     printf("Echo from server: %s\n", msg);
 }
 
-void client_send(Client *client, char *m) {
-    int n;
+void client_send(Client *client, char *filename) {
+    int inputFile;
     char buff[BUFFER_SIZE];
 
-    n = write(client->socket, m, strlen(m));
-    if (n < 0) client_error("writing to socket");
+    inputFile = open(filename, O_RDONLY);
+    if (inputFile == -1)
+    {
+        client_error("cannot open input file");
+    }
 
-    bzero(buff, BUFFER_SIZE);
-    n = read(client->socket, buff, BUFFER_SIZE);
-    if (n < 0) client_error("reading to socket");
+    while (1) {
+        // Read data into buffer.  We may not have enough to fill up buffer, so we
+        // store how many bytes were actually read in bytes_read.
+        int bytes_read = read(inputFile, buff, sizeof(buff));
 
-    client->handler(buff);
+        if (bytes_read == 0) // We're done reading from the file
+            break;
+
+        if (bytes_read < 0) {
+            // handle errors
+            client_error("input file reading");
+        }
+
+        // You need a loop for the write, because not all of the data may be written
+        // in one call; write will return how many bytes were written. p keeps
+        // track of where in the buffer we are, while we decrement bytes_read
+        // to keep track of how many bytes are left to write.
+        void *p = buff;
+        while (bytes_read > 0) {
+            int bytes_written = write(client->socket, p, bytes_read);
+            if (bytes_written <= 0) {
+                // handle errors
+                client_error("write to socket");
+            }
+            bytes_read -= bytes_written;
+            p += bytes_written;
+        }
+    }
+
+    close(inputFile);
+    printf("Finished sending\n");
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 3)
+    {
+        printf("Usage: %s [hostname] [filename]\n", argv[0]);
+        exit(1);
+    }
+
     Client *client = create_client();
     client->port = PORT;
     client->handler = &handler;
-    client_connect(client, "localhost");
+    client_connect(client, argv[1]);
 
-    char buff[BUFFER_SIZE];
-    printf("Please enter msg: ");
-    bzero(buff, BUFFER_SIZE);
-    fgets(buff, BUFFER_SIZE, stdin);
-    client_send(client, buff);
+    client_send(client, argv[2]);
+
+    client_disconnect(client);
 
     return 0;
 }
