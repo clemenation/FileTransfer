@@ -15,3 +15,6 @@
 *.exe
 *.out
 *.app
+build/client/client
+build/server/server
+build/server/test.txt

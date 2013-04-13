@@ -29,5 +29,6 @@ void client_disconnect(Client *client);
 void client_error(char *msg);
 
 int Write(int fd, void * ptr, int numbytes);
+int Read(int fd, void * ptr, int numbytes);
 
 #endif

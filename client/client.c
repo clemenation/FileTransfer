@@ -35,7 +35,7 @@ void client_send(Client *client, char *filename) {
     while (1) {
         // Read data into buffer.  We may not have enough to fill up buffer, so we
         // store how many bytes were actually read in bytes_read.
-        int bytes_read = read(inputFile, buff, sizeof(buff));
+        int bytes_read = Read(inputFile, buff, sizeof(buff));
 
         if (bytes_read == 0) // We're done reading from the file
             break;

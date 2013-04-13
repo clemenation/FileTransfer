@@ -15,7 +15,7 @@ void handler(int client) {
   int bytes_read = 0;
   Message writeMsg;
 
-  bytes_read = read(client, &writeMsg, sizeof(writeMsg));
+  bytes_read = Read(client, &writeMsg, sizeof(writeMsg));
 
   if (writeMsg.type == MSG_WRQ)
   {
@@ -32,7 +32,7 @@ void handler(int client) {
     {
       Message dataMsg;
 
-      bytes_read = read(client, &dataMsg, sizeof(dataMsg));
+      bytes_read = Read(client, &dataMsg, sizeof(dataMsg));
       if (bytes_read < 0)
       { // handle errors
         server_error("read from socket");
