@@ -47,3 +47,62 @@ Message dataMessage(int id, char *data, int size)
 
     return msg;
 }
+
+#pragma mark - Sending
+Message sendMessage(int socket, 
+    Message message, 
+    char *errorMessage,
+    void (*errorFunction)(char *))
+{
+    if (Write(socket, &message, sizeof(message)) < 0)
+    {
+        errorFunction(errorMessage);
+    }
+    return message;
+}
+
+Message sendWriteMessage(int socket, 
+    char *filename,
+    void (*errorFunction)(char *))
+{
+    return sendMessage(socket, 
+        writeMessage(filename), 
+        "cannot send write request", 
+        errorFunction);
+}
+
+Message sendDataMessage(int socket, 
+    int id, 
+    char *data, 
+    int size,
+    void (*errorFunction)(char *))
+{
+    return sendMessage(socket, 
+        dataMessage(id, data, size), 
+        "cannot send data packet", 
+        errorFunction);
+}
+
+#pragma mark - Receiving
+Message *receiveMessage(int socket, 
+  MessageType messageType, 
+  char *errorMessage, 
+  void (*errorFunction)(char *))
+{
+  Message *message = (Message *)malloc(sizeof(Message));
+  int bytes_read = Read(socket, message, sizeof(*message));
+  if (bytes_read < 0)
+  { // reading error
+    errorFunction(errorMessage);
+  }
+  else if (bytes_read == 0)
+  { // no message, return NULL
+    return NULL;
+  }
+  if (message->type != messageType)
+  { // wrong message type error
+    errorFunction("incompatible message type");
+  }
+
+  return message;
+}

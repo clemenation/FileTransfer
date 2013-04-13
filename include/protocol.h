@@ -48,4 +48,24 @@ typedef struct Message_
 Message writeMessage(char *filename);
 Message dataMessage(int id, char *data, int size);
 
+#pragma mark - Sending
+Message sendMessage(int socket, 
+    Message message, 
+    char *errorMessage,
+    void (*errorFunction)(char *));
+Message sendWriteMessage(int socket, 
+    char *filename,
+    void (*errorFunction)(char *));
+Message sendDataMessage(int socket, 
+    int id, 
+    char *data, 
+    int size,
+    void (*errorFunction)(char *));
+
+#pragma mark - Receiving
+Message *receiveMessage(int socket, 
+  MessageType messageType, 
+  char *errorMessage, 
+  void (*errorFunction)(char *));
+
 #endif

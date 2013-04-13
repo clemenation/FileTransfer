@@ -17,14 +17,10 @@ void handler(char *msg) {
 void client_send(Client *client, char *filename) {
     int inputFile;  // input file descriptor
     char buff[BUFFER_SIZE]; // buffer
-    int bytes_written = 0;  // counting bytes written to socket
 
-    // Create write request
-    Message writeMsg = writeMessage(filename);    
+    Message writeMsg = sendWriteMessage(client->socket, filename, &client_error);
 
-    // Send write request
-    bytes_written = Write(client->socket, &writeMsg, sizeof(writeMsg));
-
+    // open the file
     inputFile = open(filename, O_RDONLY);
     if (inputFile == -1)
     {   // handle errors
@@ -32,21 +28,24 @@ void client_send(Client *client, char *filename) {
     }
 
     int id = 0;
-    while (1) {
+    int bytes_read;
+    while (1) 
+    {
         // Read data into buffer.  We may not have enough to fill up buffer, so we
         // store how many bytes were actually read in bytes_read.
-        int bytes_read = Read(inputFile, buff, sizeof(buff));
+        bytes_read = Read(inputFile, buff, sizeof(buff));
 
-        if (bytes_read == 0) // We're done reading from the file
+        if (bytes_read == 0)
+        {   // end of file
             break;
+        }
 
         if (bytes_read < 0) {
             // handle errors
             client_error("input file reading");
         }
 
-        Message dataMsg = dataMessage(id, buff, bytes_read);
-        bytes_written = Write(client->socket, &dataMsg, sizeof(dataMsg));
+        sendDataMessage(client->socket, id, buff, bytes_read, &client_error);
 
         id++;   // increment id counting
     }
