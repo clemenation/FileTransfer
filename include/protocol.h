@@ -45,4 +45,7 @@ typedef struct Message_
   };
 } Message;
 
+Message writeMessage(char *filename);
+Message dataMessage(int id, char *data, int size);
+
 #endif

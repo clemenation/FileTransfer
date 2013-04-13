@@ -4,10 +4,10 @@ CFLAGS=-g -Wall -Iinclude
 
 all: client server
 
-client: client/client.o include/net_client.o
+client: client/client.o include/net_client.o include/net.o include/protocol.o
 	$(CC) $(LDFLAGS) $^ -o build/client/$@
 
-server: server/server.o include/net_server.o
+server: server/server.o include/net_server.o include/net.o include/protocol.o
 	$(CC) $(LDFLAGS) $^ -o build/server/$@
 
 clean:

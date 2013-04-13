@@ -11,27 +11,6 @@
 #include "net.h"
 #include "protocol.h"
 
-int Write(int fd, void * ptr, int numbytes)
-{
-    // You need a loop for the write, because not all of the data may be written
-    // in one call; write will return how many bytes were written. p keeps
-    // track of where in the buffer we are, while we decrement bytes_towrite
-    // to keep track of how many bytes are left to write.
-    void *p = ptr;
-    int bytes_towrite = numbytes;
-    while (bytes_towrite > 0) {
-        int bytes_written = write(fd, p, bytes_towrite);
-        if (bytes_written <= 0) {
-            // handle errors
-            server_error("write to socket");
-        }
-        bytes_towrite -= bytes_written;
-        p += bytes_written;
-    }
-
-    return (numbytes - bytes_towrite);
-}
-
 void handler(int client) {
   int bytes_read = 0;
   Message writeMsg;

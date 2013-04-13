@@ -10,63 +10,6 @@
 #include "net.h"
 #include "protocol.h"
 
-off_t fsize(const char *filename) {
-    struct stat st; 
-
-    if (stat(filename, &st) == 0)
-        return st.st_size;
-
-    return -1; 
-}
-
-int Write(int fd, void * ptr, int numbytes)
-{
-    // You need a loop for the write, because not all of the data may be written
-    // in one call; write will return how many bytes were written. p keeps
-    // track of where in the buffer we are, while we decrement bytes_towrite
-    // to keep track of how many bytes are left to write.
-    void *p = ptr;
-    int bytes_towrite = numbytes;
-    while (bytes_towrite > 0) {
-        int bytes_written = write(fd, p, bytes_towrite);
-        if (bytes_written <= 0) {
-            // handle errors
-            client_error("write to socket");
-        }
-        bytes_towrite -= bytes_written;
-        p += bytes_written;
-    }
-
-    return (numbytes - bytes_towrite);
-}
-
-Message writeMessage(char *filename)
-{
-    Message msg;
-    msg.type = MSG_WRQ;
-
-    WriteRequestMessage payload;
-    strcpy(payload.fileName, filename);
-    payload.fileSize = fsize(filename);
-    msg.writeRequest = payload;
-
-    return msg;
-}
-
-Message dataMessage(int id, char *data, int size)
-{
-    Message msg;
-    msg.type = MSG_DAT;
-
-    DataPacketMessage payload;
-    payload.id = id;
-    payload.size = size;
-    strncpy(payload.data, data, size);
-    msg.dataPacket = payload;
-
-    return msg;
-}
-
 void handler(char *msg) {
     printf("Echo from server: %s\n", msg);
 }
