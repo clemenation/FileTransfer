@@ -13,6 +13,7 @@ server: server/server.o include/net_server.o
 clean:
 	@rm -f */*.o
 	@rm -rvf build/client/client
-	@rm -rvf build/server/server
+	@rm -rvf build/server
+	@mkdir build/server
 
 .PHONY:
