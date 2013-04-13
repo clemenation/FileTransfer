@@ -9,6 +9,7 @@
 #include "config.h"
 #include "net.h"
 #include "protocol.h"
+#include "checksum.h"
 
 off_t fsize(const char *filename);
 
@@ -27,8 +28,14 @@ Message writeMessage(char *filename)
     msg.type = MSG_WRQ;
 
     WriteRequestMessage payload;
+
+    unsigned char *md5 = MD5Checksum(filename);
+    memcpy(payload.md5, md5, MD5_DIGEST_LENGTH);
+    free(md5);
+
     strcpy(payload.fileName, filename);
     payload.fileSize = fsize(filename);
+
     msg.writeRequest = payload;
 
     return msg;

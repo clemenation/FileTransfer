@@ -9,6 +9,7 @@
 #include "config.h"
 #include "net.h"
 #include "protocol.h"
+#include "checksum.h"
 
 void handler(char *msg) {
     printf("Echo from server: %s\n", msg);
@@ -26,6 +27,9 @@ void client_send(Client *client, char *filename) {
     {   // handle errors
         client_error("cannot open input file");
     }
+    printf("MD5: ");
+    printMD5Checksum(writeMsg.writeRequest.md5);
+    printf("\n");
 
     int id = 0;
     int bytes_read;

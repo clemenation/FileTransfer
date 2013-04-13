@@ -4,6 +4,7 @@
 
 #define PORT 5000
 #define BUFFER_SIZE 512
+#define MD5_DIGEST_LENGTH 16
 
 typedef enum MessageType_ 
 {
@@ -14,6 +15,7 @@ typedef struct WriteRequestMessage_
 {
   char fileName[BUFFER_SIZE];
   int fileSize;
+  unsigned char md5[MD5_DIGEST_LENGTH];
 } WriteRequestMessage;
 
 typedef struct DataPacketMessage_
