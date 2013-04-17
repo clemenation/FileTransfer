@@ -64,7 +64,7 @@ void handler(int client) {
   }
   else
   {
-    server_error("MD5 mismatch");
+    printf("ERROR: MD5 mismatch\n");
   }
   free(md5);
 }
