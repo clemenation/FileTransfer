@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
     {
         client_error("cannot open file");
     }
+    fclose(inputFile);
 
     Client *client = create_client();
     client->port = PORT;
