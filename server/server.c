@@ -36,9 +36,10 @@ void receiveFile(int client, Message writeMsg)
     server_error("cannot open output file");
   }
   sendAckMessage(client, 1, &server_error);  // accept
-  printf("Accept message sent\n");
 
   int id = 0;
+  double ttime = (double)clock()/CLOCKS_PER_SEC;
+  int prevId = 0;
   while (1)
   {
     Message *dataMsg;
@@ -58,6 +59,19 @@ void receiveFile(int client, Message writeMsg)
       server_error("write to output file");
     }
 
+    if ((double)clock()/CLOCKS_PER_SEC - ttime >= UPDATE_TIME)
+    {
+      ttime = (double)clock()/CLOCKS_PER_SEC;
+      int received = id*BUFFER_SIZE + dataMsg->dataPacket.size;
+      int total = writeMsg.writeRequest.fileSize;
+      printf("Received %.1f/%.1f KB | %.0f%% completed | %.1f KB/s\n",
+        received / 1024.0, 
+        total / 1024.0,
+        (float)received/(float)total*100.0,
+        (float)(id-prevId) * BUFFER_SIZE / 1024.0);
+      prevId = id;
+    }
+
     free(dataMsg);  // free after use
   }
 
@@ -67,6 +81,7 @@ void receiveFile(int client, Message writeMsg)
   printf("%d packet received\n", id+1);  
 
   // md5 matching
+  printf("Getting MD5 checksum\n");
   unsigned char *md5 = MD5Checksum(writeMsg.writeRequest.fileName);
   if (memcmp(md5, writeMsg.writeRequest.md5, MD5_DIGEST_LENGTH) == 0)
   {

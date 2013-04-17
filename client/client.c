@@ -5,6 +5,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #include "config.h"
 #include "net.h"
@@ -27,8 +28,6 @@ void client_send(Client *client, char *filename) {
         client_error("server denied");
     }
 
-    printf("Accept message received\n");
-
     // open the file
     inputFile = open(filename, O_RDONLY);
     if (inputFile == -1)
@@ -40,7 +39,9 @@ void client_send(Client *client, char *filename) {
     printf("\n");
 
     int id = 0;
+    int prevId = 0;
     int bytes_read;
+    double ttime = (double)clock()/CLOCKS_PER_SEC;
     while (1) 
     {
         // Read data into buffer.  We may not have enough to fill up buffer, so we
@@ -58,6 +59,19 @@ void client_send(Client *client, char *filename) {
         }
 
         sendDataMessage(client->socket, id, buff, bytes_read, &client_error);
+
+        if ((double)clock()/CLOCKS_PER_SEC - ttime >= UPDATE_TIME)
+        {
+            ttime = (double)clock()/CLOCKS_PER_SEC;
+            int sent = id*BUFFER_SIZE + bytes_read;
+            int total = writeMsg.writeRequest.fileSize;
+            printf("Sent %.1f/%.1f KB | %.0f%% completed | %.1f KB/s\n",
+                sent / 1024.0, 
+                total / 1024.0,
+                (float)sent/(float)total*100.0,
+                (float)(id-prevId) * BUFFER_SIZE / 1024.0);
+            prevId = id;
+        }
 
         id++;   // increment id counting
     }

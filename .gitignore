@@ -18,8 +18,5 @@
 build/client/client
 build/server/server
 build/server/test.txt
-build/client/20120726-1028-IMG_8030 copy.jpg
-build/client/gentleman.mp4
-build/server/20120726-1028-IMG_8030 copy.jpg
-build/client/20130324-1614-dn080-Edit.jpg
-build/server/20130324-1614-dn080-Edit.jpg
+*.jpg
+*.mp4

@@ -5,6 +5,7 @@
 #define PORT 5000
 #define BUFFER_SIZE 512
 #define MD5_DIGEST_LENGTH 16
+#define UPDATE_TIME 0.1     // in secs
 
 typedef enum MessageType_ 
 {

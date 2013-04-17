@@ -42,6 +42,7 @@ Message writeMessage(char *filename)
 
     WriteRequestMessage payload;
 
+    printf("Getting MD5 checksum\n");
     unsigned char *md5 = MD5Checksum(filename);
     memcpy(payload.md5, md5, MD5_DIGEST_LENGTH);
     free(md5);
