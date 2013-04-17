@@ -6,6 +6,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <time.h>
 
 #include "config.h"
 #include "net.h"

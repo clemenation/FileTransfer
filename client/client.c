@@ -75,6 +75,12 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    FILE *inputFile = fopen(argv[2], "rb");
+    if (inputFile == NULL)
+    {
+        client_error("cannot open file");
+    }
+
     Client *client = create_client();
     client->port = PORT;
     client->handler = &handler;

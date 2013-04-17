@@ -28,6 +28,11 @@ unsigned char *MD5Checksum(char *filename)
 {
   unsigned char *c = (unsigned char *)malloc(sizeof(unsigned char) * MD5_DIGEST_LENGTH);
   FILE *inFile = fopen (filename, "rb");
+  if (inFile == NULL)
+  {
+    printf("Error: Cannot open file %s\n", filename);
+    exit(1);
+  }
   MD5_CTX mdContext;
   int bytes;
   unsigned char data[1024];

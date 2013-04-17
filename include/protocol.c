@@ -85,10 +85,17 @@ Message sendWriteMessage(int socket,
     char *filename,
     void (*errorFunction)(char *))
 {
-    return sendMessage(socket, 
-        writeMessage(filename), 
-        "cannot send write request", 
-        errorFunction);
+  FILE *inFile = fopen (filename, "rb");
+  if (inFile == NULL)
+  {
+    errorFunction("cannot open file");
+  }
+  fclose(inFile);
+
+  return sendMessage(socket, 
+      writeMessage(filename), 
+      "cannot send write request", 
+      errorFunction);
 }
 
 Message sendDataMessage(int socket, 
