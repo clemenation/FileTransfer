@@ -21,6 +21,14 @@ void client_send(Client *client, char *filename) {
 
     Message writeMsg = sendWriteMessage(client->socket, filename, &client_error);
 
+    Message ackMsg = *receiveMessage(client->socket, MSG_ACK, "receive ack message", &client_error);
+    if (!ackMsg.ackowledgementPacket.id)
+    {
+        client_error("server denied");
+    }
+
+    printf("Accept message received\n");
+
     // open the file
     inputFile = open(filename, O_RDONLY);
     if (inputFile == -1)

@@ -22,6 +22,19 @@ off_t fsize(const char *filename) {
     return -1; 
 }
 
+Message ackMessage(int id)
+{
+  Message msg;
+  msg.type = MSG_ACK;
+  
+  AcknowledgementPacketMessage payload;
+  payload.id = id;
+
+  msg.ackowledgementPacket = payload;
+
+  return msg;
+}
+
 Message writeMessage(char *filename)
 {
     Message msg;
@@ -88,6 +101,16 @@ Message sendDataMessage(int socket,
         dataMessage(id, data, size), 
         "cannot send data packet", 
         errorFunction);
+}
+
+Message sendAckMessage(int socket,
+  int id,
+  void (*errorFunction)(char *))
+{
+  return sendMessage(socket, 
+    ackMessage(id),
+    "cannot send acknowledgement packet",
+    errorFunction);
 }
 
 #pragma mark - Receiving
