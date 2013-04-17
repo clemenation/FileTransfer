@@ -49,7 +49,7 @@ Message dataMessage(int id, char *data, int size)
     DataPacketMessage payload;
     payload.id = id;
     payload.size = size;
-    strncpy(payload.data, data, size);
+    memcpy(payload.data, data, size);
     msg.dataPacket = payload;
 
     return msg;
